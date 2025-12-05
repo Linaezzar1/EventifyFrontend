@@ -13,12 +13,7 @@ import com.eventify.app.ui.events.CreateEventScreen
 import com.eventify.app.ui.theme.EventifyTheme
 import com.eventify.app.ui.events.EditEventScreen
 import com.eventify.app.ui.tasks.TaskListScreen
-import com.eventify.app.ui.admin.DashboardScreen
-import com.eventify.app.ui.admin.UsersManagementScreen
-import com.eventify.app.ui.admin.EventsManagementScreen
-import com.eventify.app.ui.admin.StatsScreen
 import com.eventify.app.viewmodel.EventViewModel
-import com.eventify.app.viewmodel.AdminViewModel
 import com.eventify.app.model.Event
 
 class MainActivity : ComponentActivity() {
@@ -38,9 +33,6 @@ class MainActivity : ComponentActivity() {
                 var isCreatingEvent by remember { mutableStateOf(false) }
                 var isEditingEvent by remember { mutableStateOf(false) }
                 var showingTasksForEventId by remember { mutableStateOf<String?>(null) }
-                val adminViewModel = remember { AdminViewModel() }
-                var showingDashboard by remember { mutableStateOf(false) }
-                var dashboardScreen by remember { mutableStateOf<String?>(null) } // "users", "events", "stats"
 
                 when {
                     !isLoggedIn && !isSignup -> LoginScreen(
@@ -100,68 +92,6 @@ class MainActivity : ComponentActivity() {
                         onEditEvent = { isEditingEvent = true },
                         onShowTasks = { eventId -> showingTasksForEventId = eventId } // Nouvel argument
                     )
-                    // Dashboard screens
-                    showingDashboard && dashboardScreen == "users" -> UsersManagementScreen(
-                        adminViewModel = adminViewModel,
-                        eventViewModel = eventViewModel,
-                        token = userToken,
-                        onBack = { dashboardScreen = null }
-                    )
-                    showingDashboard && dashboardScreen == "participants" -> UsersManagementScreen(
-                        adminViewModel = adminViewModel,
-                        eventViewModel = eventViewModel,
-                        token = userToken,
-                        onBack = { dashboardScreen = null },
-                        filterByRole = "participant"
-                    )
-                    showingDashboard && dashboardScreen == "organisateurs" -> UsersManagementScreen(
-                        adminViewModel = adminViewModel,
-                        eventViewModel = eventViewModel,
-                        token = userToken,
-                        onBack = { dashboardScreen = null },
-                        filterByRole = "organisateur"
-                    )
-                    showingDashboard && dashboardScreen == "events" -> EventsManagementScreen(
-                        adminViewModel = adminViewModel,
-                        eventViewModel = eventViewModel,
-                        token = userToken,
-                        onBack = { dashboardScreen = null },
-                        onEventClick = { event ->
-                            selectedEvent = event
-                            showingDashboard = false
-                            dashboardScreen = null
-                        }
-                    )
-                    showingDashboard && dashboardScreen == "stats" -> StatsScreen(
-                        adminViewModel = adminViewModel,
-                        eventViewModel = eventViewModel,
-                        token = userToken,
-                        onBack = { dashboardScreen = null }
-                    )
-                    showingDashboard -> DashboardScreen(
-                        adminViewModel = adminViewModel,
-                        eventViewModel = eventViewModel,
-                        token = userToken,
-                        onLogout = {
-                            isLoggedIn = false
-                            isSignup = false
-                            userToken = ""
-                            userRole = ""
-                            userName = ""
-                            userEmail = ""
-                            userId = ""
-                            showingDashboard = false
-                            dashboardScreen = null
-                        },
-                        onBack = {
-                            showingDashboard = false
-                            dashboardScreen = null
-                        },
-                        onNavigateToUsers = { dashboardScreen = "users" },
-                        onNavigateToEvents = { dashboardScreen = "events" },
-                        onNavigateToParticipants = { dashboardScreen = "participants" },
-                        onNavigateToOrganisateurs = { dashboardScreen = "organisateurs" }
-                    )
                     else -> EventsListScreen(
                         eventViewModel = eventViewModel,
                         token = userToken,
@@ -176,8 +106,7 @@ class MainActivity : ComponentActivity() {
                             userName = ""
                             userEmail = ""
                             userId = ""
-                        },
-                        //onDashboardClick = { showingDashboard = true }
+                        }
                     )
                 }
             }

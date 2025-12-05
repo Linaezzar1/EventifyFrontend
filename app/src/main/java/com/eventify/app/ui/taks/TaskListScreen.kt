@@ -90,7 +90,7 @@ fun TaskListScreen(
                                 showEditDialog = true
                             },
                             onDelete = {
-                                eventViewModel.deleteTask(token, task._id,
+                                eventViewModel.deleteTask(token, eventId, task._id,
                                     onSuccess = {
                                         tasks = tasks.filter { it._id != task._id }
                                     },
@@ -123,7 +123,7 @@ fun TaskListScreen(
                         onError = { error = it }
                     )
                 } else {
-                    eventViewModel.updateTask(token, currentTask!!._id, req,
+                    eventViewModel.updateTask(token, eventId, currentTask!!._id, req,
                         onSuccess = {
                             showEditDialog = false
                             eventViewModel.getTasksForEvent(token, eventId,

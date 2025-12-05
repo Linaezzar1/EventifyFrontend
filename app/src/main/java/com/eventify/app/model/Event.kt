@@ -6,11 +6,21 @@ data class Event(
     val description: String?,
     val date: String,
     val location: String?,
-    val createdBy: CreatedBy?,
-    val participants: List<String>? = emptyList()
+    val createdBy: UserRef?,
+    val organizers: List<String>? = emptyList(),
+    val logisticManager: String? = null,
+    val communicationManager: String? = null,
+    val participants: List<String>? = emptyList(),
+    val logisticStaff: List<String>? = emptyList(),
+    val communicationStaff: List<String>? = emptyList(),
+    val visibility: String? = "public", // "public" ou "prive"
+    val status: String? = "brouillon", // "brouillon", "publie", "annule"
+    val createdAt: String? = null,
+    val updatedAt: String? = null
 )
 
-data class CreatedBy(
+// Référence utilisateur simplifiée (pour createdBy, etc.)
+data class UserRef(
     val _id: String,
     val name: String,
     val email: String,
@@ -19,7 +29,9 @@ data class CreatedBy(
 
 data class EventRequest(
     val title: String,
-    val description: String,
+    val description: String?,
     val date: String,
-    val location: String
+    val location: String?,
+    val visibility: String? = "public",
+    val status: String? = "brouillon"
 )

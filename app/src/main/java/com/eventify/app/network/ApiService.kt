@@ -83,11 +83,4 @@ interface ApiService {
         @Path("taskId") taskId: String
     ): Response<Unit>
 
-    // User endpoints (matching backend routes)
-    @DELETE("api/users/{id}")
-    suspend fun deleteUser(
-        @Header("Authorization") token: String,
-        @Path("id") userId: String
-    ): Response<Unit>
-
 }
