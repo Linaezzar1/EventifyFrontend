@@ -33,5 +33,6 @@ data class EventRequest(
     val date: String,
     val location: String?,
     val visibility: String? = "public",
-    val status: String? = "brouillon"
+    val status: String? = "brouillon",
+    val logisticManager: String? = null
 )

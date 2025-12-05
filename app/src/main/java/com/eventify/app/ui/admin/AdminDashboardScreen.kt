@@ -23,6 +23,7 @@ fun DashboardScreen(
     adminViewModel: AdminViewModel,
     eventViewModel: EventViewModel,
     token: String,
+    userRole: String,
     onLogout: () -> Unit,
     onBack: () -> Unit = {},
     onNavigateToUsers: () -> Unit = {},
@@ -30,6 +31,32 @@ fun DashboardScreen(
     onNavigateToParticipants: () -> Unit = {},
     onNavigateToOrganisateurs: () -> Unit = {}
 ) {
+    // Check if user has organizateur role
+    if (userRole.trim().lowercase() != "organisateur") {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Accès refusé",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.error
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Seuls les organisateurs peuvent accéder au tableau de bord.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = onBack) {
+                Text("Retour")
+            }
+        }
+        return
+    }
     val users by adminViewModel.users.collectAsState()
     val events by eventViewModel.events.collectAsState()
     val loading by adminViewModel.loading.collectAsState()

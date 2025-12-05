@@ -83,4 +83,50 @@ interface ApiService {
         @Path("taskId") taskId: String
     ): Response<Unit>
 
+    @GET("api/users")
+    suspend fun getAllUsers(@Header("Authorization") token: String): List<User>
+
+    @DELETE("api/users/{id}")
+    suspend fun deleteUser(
+        @Header("Authorization") token: String,
+        @Path("id") userId: String
+    ): Response<Unit>
+
+    //chat with bot function
+    @POST("api/chatbot/chat")
+    suspend fun chatWithBot(
+        @Header("Authorization") token: String,
+        @Body request: ChatbotRequest
+        ): ChatbotResponse
+
+    //getInbox function
+    @GET("api/messages/inbox")
+    suspend fun getInbox(@Header("Authorization") token: String): List<Message>
+
+    //getconversation fun
+    @GET("api/messages/conversation/{otherUserId}")
+    suspend fun getConversation(
+        @Header("Authorization") token: String,
+        @Path("otherUserId") otherUserId: String
+        ): List<Message>
+
+    //send message function
+    @POST("api/messages/send")
+    suspend fun sendMessage(
+        @Header("Authorization") token: String,
+        @Body request: SendMessageRequest
+        ): Message
+
+    //getmy notifications fun
+    @GET("api/notifications/my")
+    suspend fun getMyNotifications(@Header("Authorization") token: String): List<Notification>
+
+    //mark notifications as read
+    @PUT("api/notifications/{id}/read")
+    suspend fun markNotificationAsRead(
+        @Header("Authorization") token: String,
+        @Path("id") notificationId: String
+        ): Response<Unit>
+
+
 }

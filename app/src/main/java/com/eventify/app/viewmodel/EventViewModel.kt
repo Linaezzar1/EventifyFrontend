@@ -144,7 +144,7 @@ class EventViewModel : ViewModel() {
     fun updateTask(token: String, eventId: String, taskId: String, taskRequest: TaskRequest, onSuccess: (Task) -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
             try {
-                val updatedTask = RetrofitInstance.api.updateTask("Bearer $token", eventId, taskId, taskRequest)
+                val updatedTask = RetrofitInstance.api.updateTask("Bearer $token", taskId,  taskRequest)
                 onSuccess(updatedTask)
             } catch (e: Exception) {
                 onError(e.localizedMessage ?: "Erreur mise à jour tâche")
@@ -155,7 +155,7 @@ class EventViewModel : ViewModel() {
     fun deleteTask(token: String, eventId: String, taskId: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
             try {
-                val response = RetrofitInstance.api.deleteTask("Bearer $token", eventId, taskId)
+                val response = RetrofitInstance.api.deleteTask("Bearer $token",  taskId)
                 if (response.isSuccessful) {
                     onSuccess()
                 } else {

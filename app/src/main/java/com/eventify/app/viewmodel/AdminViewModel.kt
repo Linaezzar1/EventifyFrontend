@@ -41,7 +41,7 @@ class AdminViewModel : ViewModel() {
                     try {
                         val participants = RetrofitInstance.api.getParticipants("Bearer $token", event._id)
                         participants.forEach { user ->
-                            userMap[user._id] set user
+                            userMap[user._id] = user
                         }
                     } catch (e: Exception) {
                         // Continue if one fails

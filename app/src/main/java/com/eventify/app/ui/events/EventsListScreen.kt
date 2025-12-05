@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,7 +25,8 @@ fun EventsListScreen(
     userRole: String,
     onEventClick: (Event) -> Unit,
     onCreateEventClick: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onDashboardClick: (() -> Unit)? = null
 ) {
     val events by eventViewModel.events.collectAsState()
     var error by remember { mutableStateOf<String?>(null) }
@@ -40,8 +42,13 @@ fun EventsListScreen(
             TopAppBar(
                 title = { Text("Événements") },
                 actions = {
+                    if (userRole.trim() == "organisateur" && onDashboardClick != null) {
+                        IconButton(onClick = { onDashboardClick() }) {
+                            Icon(Icons.Default.Dashboard, contentDescription = "Tableau de bord", tint = Color.White)
+                        }
+                    }
                     IconButton(onClick = { onLogout() }) {
-                        Icon(Icons.Default.ExitToApp, contentDescription = "Déconnexion")
+                        Icon(Icons.Default.ExitToApp, contentDescription = "Déconnexion", tint = Color.White)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

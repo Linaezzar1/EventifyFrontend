@@ -2,7 +2,10 @@ package com.eventify.app.ui.events
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -10,6 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.eventify.app.model.EventRequest
+import com.eventify.app.model.User
+import com.eventify.app.network.RetrofitInstance
 import com.eventify.app.viewmodel.EventViewModel
 import java.time.LocalDate
 import java.time.LocalTime
@@ -33,8 +38,27 @@ fun CreateEventScreen(
 
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     var selectedTime by remember { mutableStateOf<LocalTime?>(null) }
+    
+    // For "assignée à" field
+    var logistiqueUsers by remember { mutableStateOf<List<User>>(emptyList()) }
+    var selectedLogistiqueUser by remember { mutableStateOf<User?>(null) }
+    var expandedDropdown by remember { mutableStateOf(false) }
+    var loadingUsers by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    
+    // Load logistique users on screen load
+    LaunchedEffect(Unit) {
+        loadingUsers = true
+        try {
+            val allUsers = RetrofitInstance.api.getAllUsers("Bearer $token")
+            logistiqueUsers = allUsers.filter { it.role.lowercase() == "logistique" }
+        } catch (e: Exception) {
+            error = "Erreur lors du chargement des utilisateurs logistique: ${e.localizedMessage}"
+        } finally {
+            loadingUsers = false
+        }
+    }
 
     val dateTime: LocalDateTime? = if (selectedDate != null && selectedTime != null) {
         LocalDateTime.of(selectedDate, selectedTime)
@@ -114,6 +138,53 @@ fun CreateEventScreen(
                 label = { Text("Lieu") },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            // "Assignée à" dropdown field
+            ExposedDropdownMenuBox(
+                expanded = expandedDropdown,
+                onExpandedChange = { expandedDropdown = !expandedDropdown }
+            ) {
+                OutlinedTextField(
+                    value = selectedLogistiqueUser?.name ?: "",
+                    onValueChange = { },
+                    label = { Text("Assignée à") },
+                    readOnly = true,
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedDropdown)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    placeholder = { Text("Sélectionner un utilisateur logistique") }
+                )
+                ExposedDropdownMenu(
+                    expanded = expandedDropdown,
+                    onDismissRequest = { expandedDropdown = false }
+                ) {
+                    if (loadingUsers) {
+                        DropdownMenuItem(
+                            text = { Text("Chargement...") },
+                            onClick = { }
+                        )
+                    } else if (logistiqueUsers.isEmpty()) {
+                        DropdownMenuItem(
+                            text = { Text("Aucun utilisateur logistique disponible") },
+                            onClick = { }
+                        )
+                    } else {
+                        logistiqueUsers.forEach { user ->
+                            DropdownMenuItem(
+                                text = { Text("${user.name} (${user.email})") },
+                                onClick = {
+                                    selectedLogistiqueUser = user
+                                    expandedDropdown = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
@@ -121,7 +192,13 @@ fun CreateEventScreen(
                     error = null
                     eventViewModel.createEvent(
                         token,
-                        EventRequest(title, description, dateIso ?: "", location),
+                        EventRequest(
+                            title = title,
+                            description = description,
+                            date = dateIso ?: "",
+                            location = location,
+                            logisticManager = selectedLogistiqueUser?._id
+                        ),
                         onSuccess = {
                             loading = false
                             onEventCreated()

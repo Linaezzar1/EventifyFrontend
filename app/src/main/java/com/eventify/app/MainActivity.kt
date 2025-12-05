@@ -13,7 +13,9 @@ import com.eventify.app.ui.events.CreateEventScreen
 import com.eventify.app.ui.theme.EventifyTheme
 import com.eventify.app.ui.events.EditEventScreen
 import com.eventify.app.ui.tasks.TaskListScreen
+import com.eventify.app.ui.admin.DashboardScreen
 import com.eventify.app.viewmodel.EventViewModel
+import com.eventify.app.viewmodel.AdminViewModel
 import com.eventify.app.model.Event
 
 class MainActivity : ComponentActivity() {
@@ -33,6 +35,8 @@ class MainActivity : ComponentActivity() {
                 var isCreatingEvent by remember { mutableStateOf(false) }
                 var isEditingEvent by remember { mutableStateOf(false) }
                 var showingTasksForEventId by remember { mutableStateOf<String?>(null) }
+                var showingDashboard by remember { mutableStateOf(false) }
+                val adminViewModel = remember { AdminViewModel() }
 
                 when {
                     !isLoggedIn && !isSignup -> LoginScreen(
@@ -71,6 +75,26 @@ class MainActivity : ComponentActivity() {
                             eventViewModel.loadEvents(userToken) { }
                         }
                     )
+                    showingDashboard -> DashboardScreen(
+                        adminViewModel = adminViewModel,
+                        eventViewModel = eventViewModel,
+                        token = userToken,
+                        userRole = userRole,
+                        onLogout = {
+                            isLoggedIn = false
+                            isSignup = false
+                            userToken = ""
+                            userRole = ""
+                            userName = ""
+                            userEmail = ""
+                            userId = ""
+                        },
+                        onBack = { showingDashboard = false },
+                        onNavigateToUsers = { /* TODO: Implement if needed */ },
+                        onNavigateToEvents = { showingDashboard = false },
+                        onNavigateToParticipants = { /* TODO: Implement if needed */ },
+                        onNavigateToOrganisateurs = { /* TODO: Implement if needed */ }
+                    )
                     showingTasksForEventId != null -> TaskListScreen(
                         eventId = showingTasksForEventId!!,
                         token = userToken,
@@ -106,7 +130,10 @@ class MainActivity : ComponentActivity() {
                             userName = ""
                             userEmail = ""
                             userId = ""
-                        }
+                        },
+                        onDashboardClick = if (userRole.trim() == "organisateur") {
+                            { showingDashboard = true }
+                        } else null
                     )
                 }
             }
