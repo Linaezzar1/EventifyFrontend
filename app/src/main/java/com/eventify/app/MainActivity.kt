@@ -13,6 +13,7 @@ import com.eventify.app.ui.events.CreateEventScreen
 import com.eventify.app.ui.theme.EventifyTheme
 import com.eventify.app.ui.events.EditEventScreen
 import com.eventify.app.ui.tasks.TaskListScreen
+import com.eventify.app.ui.participant.ParticipantMainScreen
 import com.eventify.app.viewmodel.EventViewModel
 import com.eventify.app.model.Event
 
@@ -53,6 +54,24 @@ class MainActivity : ComponentActivity() {
                         },
                         onSwitchToLogin = { isSignup = false }
                     )
+                    // Interface Participant avec Drawer
+                    isLoggedIn && userRole.trim().lowercase() == "participant" -> ParticipantMainScreen(
+                        userName = userName,
+                        userEmail = userEmail,
+                        userId = userId,
+                        userToken = userToken,
+                        eventViewModel = eventViewModel,
+                        onLogout = {
+                            isLoggedIn = false
+                            isSignup = false
+                            userToken = ""
+                            userRole = ""
+                            userName = ""
+                            userEmail = ""
+                            userId = ""
+                        }
+                    )
+                    // Interface pour les autres rôles (organisateur, etc.)
                     isCreatingEvent -> CreateEventScreen(
                         eventViewModel = eventViewModel,
                         token = userToken,
