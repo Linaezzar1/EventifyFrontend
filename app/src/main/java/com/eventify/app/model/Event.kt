@@ -6,18 +6,19 @@ data class Event(
     val description: String?,
     val date: String,
     val location: String?,
-    val createdBy: UserRef?,
-    val organizers: List<String>? = emptyList(),
-    val logisticManager: String? = null,
-    val communicationManager: String? = null,
-    val participants: List<String>? = emptyList(),
-    val logisticStaff: List<String>? = emptyList(),
-    val communicationStaff: List<String>? = emptyList(),
-    val visibility: String? = "public", // "public" ou "prive"
-    val status: String? = "brouillon", // "brouillon", "publie", "annule"
+    val createdBy: UserRef?,                 // populate User
+    val organizers: List<UserRef>? = emptyList(),
+    val logisticManager: UserRef? = null,
+    val communicationManager: UserRef? = null,
+    val participants: List<UserRef>? = emptyList(),
+    val logisticStaff: List<UserRef>? = emptyList(),
+    val communicationStaff: List<UserRef>? = emptyList(),
+    val visibility: String? = "public",
+    val status: String? = "brouillon",
     val createdAt: String? = null,
     val updatedAt: String? = null
 )
+
 
 // Référence utilisateur simplifiée (pour createdBy, etc.)
 data class UserRef(

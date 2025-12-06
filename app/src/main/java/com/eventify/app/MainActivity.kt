@@ -1,5 +1,6 @@
 package com.eventify.app
 
+import NotificationViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +17,11 @@ import com.eventify.app.ui.tasks.TaskListScreen
 import com.eventify.app.ui.participant.ParticipantMainScreen
 import com.eventify.app.viewmodel.EventViewModel
 import com.eventify.app.model.Event
+import com.eventify.app.model.User
+import com.eventify.app.ui.logistic.LogisticMainScreen
+import com.eventify.app.viewmodel.ChatbotViewModel
+import com.eventify.app.viewmodel.MessageViewModel
+import com.eventify.app.viewmodel.TaskViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +77,41 @@ class MainActivity : ComponentActivity() {
                             userId = ""
                         }
                     )
+
+                    //interfac logistique
+                    isLoggedIn && userRole.trim().lowercase() == "logistique" -> {
+                        val taskViewModel = remember { TaskViewModel() }
+                        val messageViewModel = remember { MessageViewModel() }
+                        val chatbotViewModel = remember { ChatbotViewModel() }
+                        val notificationViewModel = remember { NotificationViewModel() }
+                        // TODO: charger la liste de users pour la messagerie
+                        val users: List<User> = emptyList()
+
+                        LogisticMainScreen(
+                            user = User(
+                                _id = userId,
+                                name = userName,
+                                email = userEmail,
+                                role = userRole
+                            ),
+                            token = userToken,
+                            eventViewModel = eventViewModel,
+                            taskViewModel = taskViewModel,
+                            messageViewModel = messageViewModel,
+                            chatbotViewModel = chatbotViewModel,
+                            users = users,
+                            onLogout = {
+                                isLoggedIn = false
+                                isSignup = false
+                                userToken = ""
+                                userRole = ""
+                                userName = ""
+                                userEmail = ""
+                                userId = ""
+                            },
+                            notificationViewModel = notificationViewModel
+                        )
+                    }
                     // Interface pour les autres rôles (organisateur, etc.)
                     isCreatingEvent -> CreateEventScreen(
                         eventViewModel = eventViewModel,

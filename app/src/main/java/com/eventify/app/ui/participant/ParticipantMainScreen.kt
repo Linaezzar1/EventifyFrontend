@@ -24,6 +24,7 @@ import com.eventify.app.viewmodel.EventViewModel
 import com.eventify.app.viewmodel.ChatbotViewModel
 import com.eventify.app.viewmodel.MessageViewModel
 import com.eventify.app.network.RetrofitInstance
+import com.eventify.app.ui.logistic.DrawerMenuItem
 import kotlinx.coroutines.launch
 
 sealed class ParticipantScreen {

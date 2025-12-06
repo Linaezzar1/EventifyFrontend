@@ -41,7 +41,12 @@ class EventViewModel : ViewModel() {
         }
     }
 
-    fun createEvent(token: String, eventRequest: EventRequest, onSuccess: () -> Unit, onError: (String) -> Unit) {
+    fun createEvent(
+        token: String,
+        eventRequest: EventRequest,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 RetrofitInstance.api.createEvent("Bearer $token", eventRequest)
@@ -52,7 +57,13 @@ class EventViewModel : ViewModel() {
         }
     }
 
-    fun updateEvent(token: String, eventId: String, eventRequest: EventRequest, onSuccess: () -> Unit, onError: (String) -> Unit) {
+    fun updateEvent(
+        token: String,
+        eventId: String,
+        eventRequest: EventRequest,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 RetrofitInstance.api.updateEvent("Bearer $token", eventId, eventRequest)
@@ -63,7 +74,12 @@ class EventViewModel : ViewModel() {
         }
     }
 
-    fun deleteEvent(token: String, eventId: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+    fun deleteEvent(
+        token: String,
+        eventId: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 val response = RetrofitInstance.api.deleteEvent("Bearer $token", eventId)
@@ -77,7 +93,6 @@ class EventViewModel : ViewModel() {
             }
         }
     }
-
     fun joinEvent(token: String, eventId: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
             try {

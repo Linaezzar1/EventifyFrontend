@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import com.eventify.app.model.Event
 import com.eventify.app.model.User
 import com.eventify.app.viewmodel.EventViewModel
+import com.eventify.app.viewmodel.TaskViewModel
+import com.eventify.app.ui.tasks.LogisticEventDetailScreen // ajuste le package si nécessaire
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,19 +27,23 @@ fun EventDetailScreen(
     userId: String,
     token: String,
     eventViewModel: EventViewModel,
+    taskViewModel: TaskViewModel,        // <-- ajouté : fournir le TaskViewModel
     onBack: () -> Unit,
     onEventDeleted: () -> Unit,
     onEditEvent: () -> Unit,
-    onShowTasks: (String) -> Unit  // Ajout du paramètre pour afficher gestion tâche
+    onShowTasks: (String) -> Unit        // on peut garder pour compatibilité si besoin
 ) {
     var showConfirmation by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     var isParticipant by remember {
-        mutableStateOf(event.participants?.any { it._id == userId } ?: false)
+        mutableStateOf(event.participants?.any { it._id  == userId } ?: false)
     }
     var showParticipants by remember { mutableStateOf(false) }
     var participants by remember { mutableStateOf<List<User>>(emptyList()) }
     var roleFilter by remember { mutableStateOf<String?>(null) }
+
+    // --- NOUVEAU : état local pour afficher l'écran de gestion des tâches ---
+    var showTaskScreen by remember { mutableStateOf(false) }
 
     // Filtrage avancé participants
     val rolesList = listOf("Tous") + participants.map { it.role }.distinct()
@@ -45,6 +51,16 @@ fun EventDetailScreen(
         participants
     } else {
         participants.filter { it.role == roleFilter }
+    }
+
+    // Construire un User minimal à partir des infos disponibles (nécessaire pour LogisticEventDetailScreen)
+    val currentUser = remember(userId, userEmail, userRole) {
+        User().apply {
+            _id = userId
+            email = userEmail
+            name = ""
+            role = userRole
+        }
     }
 
     Scaffold(
@@ -127,7 +143,13 @@ fun EventDetailScreen(
             // Bouton gestion tâches (visible pour certains rôles)
             if (userRole == "organisateur" || userRole == "logistique" || userRole == "communication") {
                 Button(
-                    onClick = { onShowTasks(event._id) },
+                    onClick = {
+                        // On active l'écran local de gestion des tâches
+                        showTaskScreen = true
+
+                        // On appelle aussi le callback existant si l'appelant a besoin seulement de l'id
+                        onShowTasks(event._id)
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Gérer les tâches")
@@ -203,6 +225,19 @@ fun EventDetailScreen(
             confirmButton = {
                 TextButton(onClick = { showParticipants = false }) { Text("Fermer") }
             }
+        )
+    }
+
+    // --- NOUVEAU : affichage du composable LogisticEventDetailScreen en mode "overlay" / navigation locale ---
+    if (showTaskScreen) {
+        // on passe un onBack qui ferme l'écran
+        LogisticEventDetailScreen(
+            token = token,
+            user = currentUser,
+            event = event,
+            eventViewModel = eventViewModel,
+            taskViewModel = taskViewModel,
+            onBack = { showTaskScreen = false }
         )
     }
 }
